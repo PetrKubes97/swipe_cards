@@ -335,9 +335,12 @@ class _DraggableCardState extends State<DraggableCard> with TickerProviderStateM
               ? Stack(
                   children: [
                     widget.card!,
-                    if (widget.likeTag != null && rightSideSwipePercentage > 0.0) Opacity(opacity: rightSideSwipePercentage, child: widget.likeTag),
-                    if (widget.nopeTag != null && leftSideSwipePercentage > 0.0) Opacity(opacity: leftSideSwipePercentage, child: widget.nopeTag),
-                    if (widget.superLikeTag != null && upSwipePercentage < 0.0) Opacity(opacity: upSwipePercentage.abs(), child: widget.superLikeTag)
+                    if (widget.rightSwipeAllowed && widget.likeTag != null && rightSideSwipePercentage > 0.0)
+                      FilledAndOpacity(opacity: rightSideSwipePercentage, child: widget.likeTag),
+                    if (widget.leftSwipeAllowed && widget.nopeTag != null && leftSideSwipePercentage > 0.0)
+                      FilledAndOpacity(opacity: leftSideSwipePercentage, child: widget.nopeTag),
+                    if (widget.upSwipeAllowed && widget.superLikeTag != null && upSwipePercentage < 0.0)
+                      FilledAndOpacity(opacity: upSwipePercentage.abs(), child: widget.superLikeTag)
                   ],
                 )
               : Container(),
@@ -361,5 +364,21 @@ class _DraggableCardState extends State<DraggableCard> with TickerProviderStateM
     setState(() {
       isAnchorInitialized = true;
     });
+  }
+}
+
+class FilledAndOpacity extends StatelessWidget {
+  final Widget? child;
+  final double opacity;
+
+  const FilledAndOpacity({super.key, required this.child, required this.opacity});
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+        child: Opacity(
+      child: child,
+      opacity: opacity,
+    ));
   }
 }
