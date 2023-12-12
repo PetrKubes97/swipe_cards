@@ -21,6 +21,8 @@ class SwipeCards extends StatefulWidget {
   final double swipeThreshold;
   final double tagMinThreshold;
 
+  final Function()? onUnsuccessfulSwipeAttempt;
+
   SwipeCards({
     Key? key,
     required this.matchEngine,
@@ -35,7 +37,8 @@ class SwipeCards extends StatefulWidget {
     this.rightSwipeAllowed = true,
     this.itemChanged,
     this.swipeThreshold = 0.15,
-    this.tagMinThreshold = 0.5
+    this.tagMinThreshold = 0.5,
+    this.onUnsuccessfulSwipeAttempt
   }) : super(key: key);
 
   @override
@@ -210,6 +213,7 @@ class _SwipeCardsState extends State<SwipeCards> {
             isBackCard: false,
             swipeThreshold: widget.swipeThreshold,
             tagMinThreshold: widget.tagMinThreshold,
+            onUnsuccessfulSwipeAttempt: widget.onUnsuccessfulSwipeAttempt,
           )
       ],
     );

@@ -26,6 +26,8 @@ class DraggableCard extends StatefulWidget {
   final double swipeThreshold;
   final double tagMinThreshold;
 
+  final Function()? onUnsuccessfulSwipeAttempt;
+
   DraggableCard(
       {this.card,
       this.likeTag,
@@ -42,7 +44,8 @@ class DraggableCard extends StatefulWidget {
       this.isBackCard = false,
       this.padding = EdgeInsets.zero,
       this.swipeThreshold = 0.15,
-      this.tagMinThreshold = 0.5});
+      this.tagMinThreshold = 0.5,
+      this.onUnsuccessfulSwipeAttempt});
 
   @override
   _DraggableCardState createState() => _DraggableCardState();
@@ -70,14 +73,14 @@ class _DraggableCardState extends State<DraggableCard> with TickerProviderStateM
   void initState() {
     super.initState();
     slideBackAnimation = AnimationController(
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
     )
       ..addListener(() => setState(() {
             cardOffset = Offset.lerp(
               slideBackStart,
               const Offset(0.0, 0.0),
-              Curves.elasticOut.transform(slideBackAnimation.value),
+              ElasticOutCurve(0.8).transform(slideBackAnimation.value),
             );
 
             if (null != widget.onSlideUpdate) {
@@ -95,6 +98,7 @@ class _DraggableCardState extends State<DraggableCard> with TickerProviderStateM
             slideBackStart = null;
             dragPosition = null;
           });
+          widget.onUnsuccessfulSwipeAttempt?.call();
         }
       });
 
@@ -310,7 +314,7 @@ class _DraggableCardState extends State<DraggableCard> with TickerProviderStateM
 
     double applyThreshold(double percentage) {
       final result = percentage < widget.tagMinThreshold ? 0.0 : ((1 / (1 - widget.tagMinThreshold)) * (percentage - widget.tagMinThreshold));
-      return min(0, max(1.0, result)); // Just to avoid some nasty double overflows
+      return max(0, min(1.0, result)); // Just to avoid some nasty double overflows
     }
 
     final xProgress = cardOffset!.dx / (anchorBounds?.width ?? double.infinity) / widget.swipeThreshold;
