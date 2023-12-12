@@ -309,7 +309,8 @@ class _DraggableCardState extends State<DraggableCard> with TickerProviderStateM
     }
 
     double applyThreshold(double percentage) {
-      return percentage < widget.tagMinThreshold ? 0.0 : percentage;
+      final result = percentage < widget.tagMinThreshold ? 0.0 : ((1 / (1 - widget.tagMinThreshold)) * (percentage - widget.tagMinThreshold));
+      return min(0, max(1.0, result)); // Just to avoid some nasty double overflows
     }
 
     final xProgress = cardOffset!.dx / (anchorBounds?.width ?? double.infinity) / widget.swipeThreshold;
