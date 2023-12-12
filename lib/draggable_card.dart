@@ -344,7 +344,10 @@ class _DraggableCardState extends State<DraggableCard> with TickerProviderStateM
                       FilledAndOpacity(opacity: rightSideSwipePercentage, child: widget.likeTag),
                     if (widget.leftSwipeAllowed && widget.nopeTag != null && leftSideSwipePercentage > 0.0)
                       FilledAndOpacity(opacity: leftSideSwipePercentage, child: widget.nopeTag),
-                    if (widget.upSwipeAllowed && widget.superLikeTag != null && upSwipePercentage > 0.0)
+                    if (widget.upSwipeAllowed &&
+                        widget.superLikeTag != null &&
+                        upSwipePercentage > 0.0 &&
+                        (slideRegion == null || slideRegion == SlideRegion.inSuperLikeRegion))
                       FilledAndOpacity(opacity: upSwipePercentage.abs(), child: widget.superLikeTag)
                   ],
                 )
