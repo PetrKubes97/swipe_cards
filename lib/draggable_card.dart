@@ -384,9 +384,11 @@ class FilledAndOpacity extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned.fill(
-        child: Opacity(
-      child: child,
-      opacity: opacity,
-    ));
+        child: RepaintBoundary(
+          child: Opacity(
+                child: child,
+                opacity: opacity,
+              ),
+        ));
   }
 }
