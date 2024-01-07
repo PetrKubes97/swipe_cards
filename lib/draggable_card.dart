@@ -324,34 +324,36 @@ class _DraggableCardState extends State<DraggableCard> with TickerProviderStateM
     final leftSideSwipePercentage = applyThreshold(max(min(xProgress, 0.0), -1.0).abs());
     final upSwipePercentage = applyThreshold(max(min(yProgress, 0.0), -1.0).abs());
 
-    return Transform(
-      transform: Matrix4.translationValues(cardOffset!.dx, cardOffset!.dy, 0.0)..rotateZ(_rotation(anchorBounds)),
-      origin: _rotationOrigin(anchorBounds),
-      child: Container(
-        key: profileCardKey,
-        width: anchorBounds?.width,
-        height: anchorBounds?.height,
-        padding: widget.padding,
-        child: GestureDetector(
-          onPanStart: _onPanStart,
-          onPanUpdate: _onPanUpdate,
-          onPanEnd: _onPanEnd,
-          child: widget.card != null
-              ? Stack(
-                  children: [
-                    widget.card!,
-                    if (widget.rightSwipeAllowed && widget.likeTag != null && rightSideSwipePercentage > 0.0)
-                      FilledAndOpacity(opacity: rightSideSwipePercentage, child: widget.likeTag),
-                    if (widget.leftSwipeAllowed && widget.nopeTag != null && leftSideSwipePercentage > 0.0)
-                      FilledAndOpacity(opacity: leftSideSwipePercentage, child: widget.nopeTag),
-                    if (widget.upSwipeAllowed &&
-                        widget.superLikeTag != null &&
-                        upSwipePercentage > 0.0 &&
-                        (slideRegion == null || slideRegion == SlideRegion.inSuperLikeRegion))
-                      FilledAndOpacity(opacity: upSwipePercentage.abs(), child: widget.superLikeTag)
-                  ],
-                )
-              : Container(),
+    return RepaintBoundary(
+      child: Transform(
+        transform: Matrix4.translationValues(cardOffset!.dx, cardOffset!.dy, 0.0)..rotateZ(_rotation(anchorBounds)),
+        origin: _rotationOrigin(anchorBounds),
+        child: Container(
+          key: profileCardKey,
+          width: anchorBounds?.width,
+          height: anchorBounds?.height,
+          padding: widget.padding,
+          child: GestureDetector(
+            onPanStart: _onPanStart,
+            onPanUpdate: _onPanUpdate,
+            onPanEnd: _onPanEnd,
+            child: widget.card != null
+                ? Stack(
+                    children: [
+                      widget.card!,
+                      if (widget.rightSwipeAllowed && widget.likeTag != null && (rightSideSwipePercentage > 0.0 || slideOutDirection == SlideDirection.right))
+                        FilledAndOpacity(opacity: rightSideSwipePercentage, child: widget.likeTag!),
+                      if (widget.leftSwipeAllowed && widget.nopeTag != null && (leftSideSwipePercentage > 0.0 || slideOutDirection == SlideDirection.left))
+                        FilledAndOpacity(opacity: leftSideSwipePercentage, child: widget.nopeTag!),
+                      if (widget.upSwipeAllowed &&
+                          widget.superLikeTag != null &&
+                          upSwipePercentage > 0.0 &&
+                          (slideRegion == SlideRegion.inSuperLikeRegion || slideOutDirection == SlideDirection.up))
+                        FilledAndOpacity(opacity: upSwipePercentage.abs(), child: widget.superLikeTag!)
+                    ],
+                  )
+                : Container(),
+          ),
         ),
       ),
     );
@@ -376,7 +378,7 @@ class _DraggableCardState extends State<DraggableCard> with TickerProviderStateM
 }
 
 class FilledAndOpacity extends StatelessWidget {
-  final Widget? child;
+  final Widget child;
   final double opacity;
 
   const FilledAndOpacity({super.key, required this.child, required this.opacity});
@@ -385,10 +387,10 @@ class FilledAndOpacity extends StatelessWidget {
   Widget build(BuildContext context) {
     return Positioned.fill(
         child: RepaintBoundary(
-          child: Opacity(
-                child: child,
-                opacity: opacity,
-              ),
-        ));
+      child: Opacity(
+        child: child,
+        opacity: opacity,
+      ),
+    ));
   }
 }

@@ -117,13 +117,14 @@ class _SwipeCardsState extends State<SwipeCards> {
   }
 
   Widget _buildBackCard() {
-    return Transform(
-      transform: Matrix4.identity()..scale(_nextCardScale, _nextCardScale),
-      alignment: Alignment.center,
-      child: ProfileCard(
-        child: widget.itemBuilder(context, widget.matchEngine._nextItemIndex!),
-      ),
-    );
+    return widget.itemBuilder(context, widget.matchEngine._nextItemIndex!);
+    // return Transform(
+    //   transform: Matrix4.identity()..scale(_nextCardScale, _nextCardScale),
+    //   alignment: Alignment.center,
+    //   child: ProfileCard(
+    //     child: widget.itemBuilder(context, widget.matchEngine._nextItemIndex!),
+    //   ),
+    // );
   }
 
   void _onSlideUpdate(double distance) {
