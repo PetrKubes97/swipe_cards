@@ -23,23 +23,23 @@ class SwipeCards extends StatefulWidget {
 
   final Function()? onUnsuccessfulSwipeAttempt;
 
-  SwipeCards({
-    Key? key,
-    required this.matchEngine,
-    required this.onStackFinished,
-    required this.itemBuilder,
-    this.likeTag,
-    this.nopeTag,
-    this.superLikeTag,
-    this.fillSpace = true,
-    this.upSwipeAllowed = false,
-    this.leftSwipeAllowed = true,
-    this.rightSwipeAllowed = true,
-    this.itemChanged,
-    this.swipeThreshold = 0.15,
-    this.tagMinThreshold = 0.5,
-    this.onUnsuccessfulSwipeAttempt
-  }) : super(key: key);
+  SwipeCards(
+      {Key? key,
+      required this.matchEngine,
+      required this.onStackFinished,
+      required this.itemBuilder,
+      this.likeTag,
+      this.nopeTag,
+      this.superLikeTag,
+      this.fillSpace = true,
+      this.upSwipeAllowed = false,
+      this.leftSwipeAllowed = true,
+      this.rightSwipeAllowed = true,
+      this.itemChanged,
+      this.swipeThreshold = 0.15,
+      this.tagMinThreshold = 0.5,
+      this.onUnsuccessfulSwipeAttempt})
+      : super(key: key);
 
   @override
   _SwipeCardsState createState() => _SwipeCardsState();
@@ -128,9 +128,9 @@ class _SwipeCardsState extends State<SwipeCards> {
   }
 
   void _onSlideUpdate(double distance) {
-    setState(() {
-      _nextCardScale = 0.9 + (0.1 * (distance / 100.0)).clamp(0.0, 0.1);
-    });
+    // setState(() {
+    //   _nextCardScale = 0.9 + (0.1 * (distance / 100.0)).clamp(0.0, 0.1);
+    // });
   }
 
   void _onSlideRegion(SlideRegion? region) {
@@ -197,6 +197,7 @@ class _SwipeCardsState extends State<SwipeCards> {
             leftSwipeAllowed: widget.leftSwipeAllowed,
             rightSwipeAllowed: widget.rightSwipeAllowed,
             isBackCard: true,
+            decision: Decision.undecided,
           ),
         if (widget.matchEngine.currentItem != null)
           DraggableCard(
@@ -215,6 +216,7 @@ class _SwipeCardsState extends State<SwipeCards> {
             swipeThreshold: widget.swipeThreshold,
             tagMinThreshold: widget.tagMinThreshold,
             onUnsuccessfulSwipeAttempt: widget.onUnsuccessfulSwipeAttempt,
+            decision: widget.matchEngine.currentItem!.decision,
           )
       ],
     );

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:swipe_cards/swipe_cards.dart';
 
 enum SlideDirection { left, right, up }
 
@@ -22,6 +23,7 @@ class DraggableCard extends StatefulWidget {
   final bool rightSwipeAllowed;
   final EdgeInsets padding;
   final bool isBackCard;
+  final Decision decision;
 
   final double swipeThreshold;
   final double tagMinThreshold;
@@ -45,13 +47,15 @@ class DraggableCard extends StatefulWidget {
       this.padding = EdgeInsets.zero,
       this.swipeThreshold = 0.15,
       this.tagMinThreshold = 0.5,
-      this.onUnsuccessfulSwipeAttempt});
+      this.onUnsuccessfulSwipeAttempt,
+      required this.decision});
 
   @override
   _DraggableCardState createState() => _DraggableCardState();
 }
 
-class _DraggableCardState extends State<DraggableCard> with TickerProviderStateMixin {
+class _DraggableCardState extends State<DraggableCard>
+    with TickerProviderStateMixin {
   GlobalKey profileCardKey = GlobalKey(debugLabel: 'profile_card_key');
   Offset? cardOffset = const Offset(0.0, 0.0);
   Offset? dragStart;
@@ -166,34 +170,40 @@ class _DraggableCardState extends State<DraggableCard> with TickerProviderStateM
 
   Offset _chooseRandomDragStart() {
     final cardContext = profileCardKey.currentContext!;
-    final cardTopLeft = (cardContext.findRenderObject() as RenderBox).localToGlobal(const Offset(0.0, 0.0));
-    final dragStartY = cardContext.size!.height * (Random().nextDouble() < 0.5 ? 0.25 : 0.75) + cardTopLeft.dy;
+    final cardTopLeft = (cardContext.findRenderObject() as RenderBox)
+        .localToGlobal(const Offset(0.0, 0.0));
+    final dragStartY =
+        cardContext.size!.height * (Random().nextDouble() < 0.5 ? 0.25 : 0.75) +
+            cardTopLeft.dy;
     return Offset(cardContext.size!.width / 2 + cardTopLeft.dx, dragStartY);
   }
 
   void _slideLeft() async {
-    await Future.delayed(Duration(milliseconds: 1)).then((_) {
+    await Future.delayed(Duration(milliseconds: 250)).then((_) {
       final screenWidth = context.size!.width;
       dragStart = _chooseRandomDragStart();
-      slideOutTween = Tween(begin: const Offset(0.0, 0.0), end: Offset(-2 * screenWidth, 0.0));
+      slideOutTween = Tween(
+          begin: const Offset(0.0, 0.0), end: Offset(-2 * screenWidth, 0.0));
       slideOutAnimation.forward(from: 0.0);
     });
   }
 
   void _slideRight() async {
-    await Future.delayed(Duration(milliseconds: 1)).then((_) {
+    await Future.delayed(Duration(milliseconds: 250)).then((_) {
       final screenWidth = context.size!.width;
       dragStart = _chooseRandomDragStart();
-      slideOutTween = Tween(begin: const Offset(0.0, 0.0), end: Offset(2 * screenWidth, 0.0));
+      slideOutTween = Tween(
+          begin: const Offset(0.0, 0.0), end: Offset(2 * screenWidth, 0.0));
       slideOutAnimation.forward(from: 0.0);
     });
   }
 
   void _slideUp() async {
-    await Future.delayed(Duration(milliseconds: 1)).then((_) {
+    await Future.delayed(Duration(milliseconds: 250)).then((_) {
       final screenHeight = context.size!.height;
       dragStart = _chooseRandomDragStart();
-      slideOutTween = Tween(begin: const Offset(0.0, 0.0), end: Offset(0.0, -2 * screenHeight));
+      slideOutTween = Tween(
+          begin: const Offset(0.0, 0.0), end: Offset(0.0, -2 * screenHeight));
       slideOutAnimation.forward(from: 0.0);
     });
   }
@@ -207,13 +217,18 @@ class _DraggableCardState extends State<DraggableCard> with TickerProviderStateM
   }
 
   void _onPanUpdate(DragUpdateDetails details) {
-    final isInLeftRegion = (cardOffset!.dx / context.size!.width) < -widget.swipeThreshold;
-    final isInRightRegion = (cardOffset!.dx / context.size!.width) > widget.swipeThreshold;
-    final isInTopRegion = (cardOffset!.dy / context.size!.height) < -widget.swipeThreshold;
+    final isInLeftRegion =
+        (cardOffset!.dx / context.size!.width) < -widget.swipeThreshold;
+    final isInRightRegion =
+        (cardOffset!.dx / context.size!.width) > widget.swipeThreshold;
+    final isInTopRegion =
+        (cardOffset!.dy / context.size!.height) < -widget.swipeThreshold;
 
     setState(() {
       if (isInLeftRegion || isInRightRegion) {
-        slideRegion = isInLeftRegion ? SlideRegion.inNopeRegion : SlideRegion.inLikeRegion;
+        slideRegion = isInLeftRegion
+            ? SlideRegion.inNopeRegion
+            : SlideRegion.inLikeRegion;
       } else if (isInTopRegion) {
         slideRegion = SlideRegion.inSuperLikeRegion;
       } else {
@@ -236,14 +251,18 @@ class _DraggableCardState extends State<DraggableCard> with TickerProviderStateM
   void _onPanEnd(DragEndDetails details) {
     final dragVector = cardOffset! / cardOffset!.distance;
 
-    final isInLeftRegion = (cardOffset!.dx / context.size!.width) < -widget.swipeThreshold;
-    final isInRightRegion = (cardOffset!.dx / context.size!.width) > widget.swipeThreshold;
-    final isInTopRegion = (cardOffset!.dy / context.size!.height) < -widget.swipeThreshold;
+    final isInLeftRegion =
+        (cardOffset!.dx / context.size!.width) < -widget.swipeThreshold;
+    final isInRightRegion =
+        (cardOffset!.dx / context.size!.width) > widget.swipeThreshold;
+    final isInTopRegion =
+        (cardOffset!.dy / context.size!.height) < -widget.swipeThreshold;
 
     setState(() {
       if (isInLeftRegion) {
         if (widget.leftSwipeAllowed) {
-          slideOutTween = Tween(begin: cardOffset, end: dragVector * (2 * context.size!.width));
+          slideOutTween = Tween(
+              begin: cardOffset, end: dragVector * (2 * context.size!.width));
           slideOutAnimation.forward(from: 0.0);
 
           slideOutDirection = SlideDirection.left;
@@ -253,7 +272,8 @@ class _DraggableCardState extends State<DraggableCard> with TickerProviderStateM
         }
       } else if (isInRightRegion) {
         if (widget.rightSwipeAllowed) {
-          slideOutTween = Tween(begin: cardOffset, end: dragVector * (2 * context.size!.width));
+          slideOutTween = Tween(
+              begin: cardOffset, end: dragVector * (2 * context.size!.width));
           slideOutAnimation.forward(from: 0.0);
 
           slideOutDirection = SlideDirection.right;
@@ -263,7 +283,8 @@ class _DraggableCardState extends State<DraggableCard> with TickerProviderStateM
         }
       } else if (isInTopRegion) {
         if (widget.upSwipeAllowed) {
-          slideOutTween = Tween(begin: cardOffset, end: dragVector * (2 * context.size!.height));
+          slideOutTween = Tween(
+              begin: cardOffset, end: dragVector * (2 * context.size!.height));
           slideOutAnimation.forward(from: 0.0);
 
           slideOutDirection = SlideDirection.up;
@@ -285,8 +306,11 @@ class _DraggableCardState extends State<DraggableCard> with TickerProviderStateM
 
   double _rotation(Rect? dragBounds) {
     if (dragStart != null) {
-      final rotationCornerMultiplier = dragStart!.dy >= dragBounds!.top + (dragBounds.height / 2) ? -1 : 1;
-      return (pi / 8) * (cardOffset!.dx / dragBounds.width) * rotationCornerMultiplier;
+      final rotationCornerMultiplier =
+          dragStart!.dy >= dragBounds!.top + (dragBounds.height / 2) ? -1 : 1;
+      return (pi / 8) *
+          (cardOffset!.dx / dragBounds.width) *
+          rotationCornerMultiplier;
     } else {
       return 0.0;
     }
@@ -308,25 +332,46 @@ class _DraggableCardState extends State<DraggableCard> with TickerProviderStateM
 
     //Disables dragging card while slide out animation is in progress. Solves
     // issue that fast swipes cause the back card not loading
-    if (widget.isBackCard && anchorBounds != null && cardOffset!.dx < anchorBounds!.height) {
+    if (widget.isBackCard &&
+        anchorBounds != null &&
+        cardOffset!.dx < anchorBounds!.height) {
       cardOffset = Offset.zero;
     }
 
-    double applyThreshold(double percentage) {
-      final result = percentage < widget.tagMinThreshold ? 0.0 : ((1 / (1 - widget.tagMinThreshold)) * (percentage - widget.tagMinThreshold));
-      return max(0, min(1.0, result)); // Just to avoid some nasty double overflows
+    double getTagVisibility(double percentage, Decision decision) {
+      if (widget.decision == decision) return 1.0;
+
+      final result = percentage < widget.tagMinThreshold
+          ? 0.0
+          : ((1 / (1 - widget.tagMinThreshold)) *
+              (percentage - widget.tagMinThreshold));
+      // Just to avoid some nasty double overflows
+      return max(0, min(1.0, result));
     }
 
-    final xProgress = cardOffset!.dx / (anchorBounds?.width ?? double.infinity) / widget.swipeThreshold;
-    final yProgress = cardOffset!.dy / (anchorBounds?.height ?? double.infinity) / widget.swipeThreshold;
 
-    final rightSideSwipePercentage = applyThreshold(max(min(xProgress, 1.0), 0.0));
-    final leftSideSwipePercentage = applyThreshold(max(min(xProgress, 0.0), -1.0).abs());
-    final upSwipePercentage = applyThreshold(max(min(yProgress, 0.0), -1.0).abs());
+    final xProgress = cardOffset!.dx /
+        (anchorBounds?.width ?? double.infinity) /
+        widget.swipeThreshold;
+    final yProgress = cardOffset!.dy /
+        (anchorBounds?.height ?? double.infinity) /
+        widget.swipeThreshold;
+
+    final rightSideSwipePercentage =
+        getTagVisibility(max(min(xProgress, 1.0), 0.0), Decision.like);
+    final leftSideSwipePercentage =
+        getTagVisibility(max(min(xProgress, 0.0), -1.0).abs(), Decision.nope);
+    final upSwipePercentage =
+        getTagVisibility(max(min(yProgress, 0.0), -1.0).abs(), Decision.superLike);
+
+    // Shows tags on like/dislike/superlike click
+    // || widget.decision != Decision.undecided
 
     return RepaintBoundary(
       child: Transform(
-        transform: Matrix4.translationValues(cardOffset!.dx, cardOffset!.dy, 0.0)..rotateZ(_rotation(anchorBounds)),
+        transform:
+            Matrix4.translationValues(cardOffset!.dx, cardOffset!.dy, 0.0)
+              ..rotateZ(_rotation(anchorBounds)),
         origin: _rotationOrigin(anchorBounds),
         child: Container(
           key: profileCardKey,
@@ -341,15 +386,31 @@ class _DraggableCardState extends State<DraggableCard> with TickerProviderStateM
                 ? Stack(
                     children: [
                       widget.card!,
-                      if (widget.rightSwipeAllowed && widget.likeTag != null && (rightSideSwipePercentage > 0.0 || slideOutDirection == SlideDirection.right))
-                        FilledAndOpacity(opacity: rightSideSwipePercentage, child: widget.likeTag!),
-                      if (widget.leftSwipeAllowed && widget.nopeTag != null && (leftSideSwipePercentage > 0.0 || slideOutDirection == SlideDirection.left))
-                        FilledAndOpacity(opacity: leftSideSwipePercentage, child: widget.nopeTag!),
-                      if (widget.upSwipeAllowed &&
+                      if ((widget.rightSwipeAllowed ||
+                              widget.decision != Decision.undecided) &&
+                          widget.likeTag != null &&
+                          (rightSideSwipePercentage > 0.0 ||
+                              slideOutDirection == SlideDirection.right))
+                        FilledAndOpacity(
+                            opacity: rightSideSwipePercentage,
+                            child: widget.likeTag!),
+                      if ((widget.leftSwipeAllowed ||
+                              widget.decision != Decision.undecided) &&
+                          widget.nopeTag != null &&
+                          (leftSideSwipePercentage > 0.0 ||
+                              slideOutDirection == SlideDirection.left))
+                        FilledAndOpacity(
+                            opacity: leftSideSwipePercentage,
+                            child: widget.nopeTag!),
+                      if ((widget.upSwipeAllowed ||
+                              widget.decision != Decision.undecided) &&
                           widget.superLikeTag != null &&
                           upSwipePercentage > 0.0 &&
-                          (slideRegion == SlideRegion.inSuperLikeRegion || slideOutDirection == SlideDirection.up))
-                        FilledAndOpacity(opacity: upSwipePercentage.abs(), child: widget.superLikeTag!)
+                          (slideRegion == SlideRegion.inSuperLikeRegion ||
+                              slideOutDirection == SlideDirection.up))
+                        FilledAndOpacity(
+                            opacity: upSwipePercentage.abs(),
+                            child: widget.superLikeTag!)
                     ],
                   )
                 : Container(),
@@ -363,7 +424,8 @@ class _DraggableCardState extends State<DraggableCard> with TickerProviderStateM
     await Future.delayed(Duration(milliseconds: 3));
     box = context.findRenderObject() as RenderBox?;
     topLeft = box!.size.topLeft(box!.localToGlobal(const Offset(0.0, 0.0)));
-    bottomRight = box!.size.bottomRight(box!.localToGlobal(const Offset(0.0, 0.0)));
+    bottomRight =
+        box!.size.bottomRight(box!.localToGlobal(const Offset(0.0, 0.0)));
     anchorBounds = new Rect.fromLTRB(
       topLeft.dx,
       topLeft.dy,
@@ -381,7 +443,8 @@ class FilledAndOpacity extends StatelessWidget {
   final Widget child;
   final double opacity;
 
-  const FilledAndOpacity({super.key, required this.child, required this.opacity});
+  const FilledAndOpacity(
+      {super.key, required this.child, required this.opacity});
 
   @override
   Widget build(BuildContext context) {
