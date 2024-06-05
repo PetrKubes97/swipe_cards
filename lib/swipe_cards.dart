@@ -49,6 +49,8 @@ class _SwipeCardsState extends State<SwipeCards> {
   Key? _frontCard;
   SwipeItem? _currentItem;
   double _nextCardScale = 0.9;
+
+  // Slide region is quite sketchy
   SlideRegion? slideRegion;
 
   @override
@@ -134,13 +136,13 @@ class _SwipeCardsState extends State<SwipeCards> {
   }
 
   void _onSlideRegion(SlideRegion? region) {
-    setState(() {
-      slideRegion = region;
-      SwipeItem? currentMatch = widget.matchEngine.currentItem;
-      if (currentMatch != null && currentMatch.onSlideUpdate != null) {
-        currentMatch.onSlideUpdate!(region);
-      }
-    });
+    if (region == slideRegion) return;
+
+    slideRegion = region;
+    SwipeItem? currentMatch = widget.matchEngine.currentItem;
+    if (currentMatch != null && currentMatch.onSlideUpdate != null) {
+      currentMatch.onSlideUpdate!(region);
+    }
   }
 
   void _onSlideOutComplete(SlideDirection? direction) {

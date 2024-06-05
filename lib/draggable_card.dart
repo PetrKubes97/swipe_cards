@@ -349,7 +349,6 @@ class _DraggableCardState extends State<DraggableCard>
       return max(0, min(1.0, result));
     }
 
-
     final xProgress = cardOffset!.dx /
         (anchorBounds?.width ?? double.infinity) /
         widget.swipeThreshold;
@@ -361,60 +360,54 @@ class _DraggableCardState extends State<DraggableCard>
         getTagVisibility(max(min(xProgress, 1.0), 0.0), Decision.like);
     final leftSideSwipePercentage =
         getTagVisibility(max(min(xProgress, 0.0), -1.0).abs(), Decision.nope);
-    final upSwipePercentage =
-        getTagVisibility(max(min(yProgress, 0.0), -1.0).abs(), Decision.superLike);
+    final upSwipePercentage = getTagVisibility(
+        max(min(yProgress, 0.0), -1.0).abs(), Decision.superLike);
 
     // Shows tags on like/dislike/superlike click
-    // || widget.decision != Decision.undecided
-
-    return RepaintBoundary(
-      child: Transform(
-        transform:
-            Matrix4.translationValues(cardOffset!.dx, cardOffset!.dy, 0.0)
-              ..rotateZ(_rotation(anchorBounds)),
-        origin: _rotationOrigin(anchorBounds),
-        child: Container(
-          key: profileCardKey,
-          width: anchorBounds?.width,
-          height: anchorBounds?.height,
-          padding: widget.padding,
-          child: GestureDetector(
-            onPanStart: _onPanStart,
-            onPanUpdate: _onPanUpdate,
-            onPanEnd: _onPanEnd,
-            child: widget.card != null
-                ? Stack(
-                    children: [
-                      widget.card!,
-                      if ((widget.rightSwipeAllowed ||
-                              widget.decision != Decision.undecided) &&
-                          widget.likeTag != null &&
-                          (rightSideSwipePercentage > 0.0 ||
-                              slideOutDirection == SlideDirection.right))
-                        FilledAndOpacity(
-                            opacity: rightSideSwipePercentage,
-                            child: widget.likeTag!),
-                      if ((widget.leftSwipeAllowed ||
-                              widget.decision != Decision.undecided) &&
-                          widget.nopeTag != null &&
-                          (leftSideSwipePercentage > 0.0 ||
-                              slideOutDirection == SlideDirection.left))
-                        FilledAndOpacity(
-                            opacity: leftSideSwipePercentage,
-                            child: widget.nopeTag!),
-                      if ((widget.upSwipeAllowed ||
-                              widget.decision != Decision.undecided) &&
-                          widget.superLikeTag != null &&
-                          upSwipePercentage > 0.0 &&
-                          (slideRegion == SlideRegion.inSuperLikeRegion ||
-                              slideOutDirection == SlideDirection.up))
-                        FilledAndOpacity(
-                            opacity: upSwipePercentage.abs(),
-                            child: widget.superLikeTag!)
-                    ],
-                  )
-                : Container(),
-          ),
+    return Transform(
+      transform: Matrix4.translationValues(cardOffset!.dx, cardOffset!.dy, 0.0)
+        ..rotateZ(_rotation(anchorBounds)),
+      origin: _rotationOrigin(anchorBounds),
+      child: Container(
+        key: profileCardKey,
+        width: anchorBounds?.width,
+        height: anchorBounds?.height,
+        padding: widget.padding,
+        child: GestureDetector(
+          onPanStart: _onPanStart,
+          onPanUpdate: _onPanUpdate,
+          onPanEnd: _onPanEnd,
+          child: widget.card != null
+              ? Stack(
+                  children: [
+                    widget.card!,
+                    if (widget.rightSwipeAllowed &&
+                        widget.likeTag != null &&
+                        (rightSideSwipePercentage > 0.0 ||
+                            (slideOutDirection == SlideDirection.right &&
+                                widget.decision != Decision.undecided)))
+                      FilledAndOpacity(
+                          opacity: rightSideSwipePercentage,
+                          child: widget.likeTag!),
+                    if (widget.leftSwipeAllowed &&
+                        widget.nopeTag != null &&
+                        (leftSideSwipePercentage > 0.0 ||
+                            (slideOutDirection == SlideDirection.left &&
+                                widget.decision != Decision.undecided)))
+                      FilledAndOpacity(
+                          opacity: leftSideSwipePercentage,
+                          child: widget.nopeTag!),
+                    if (widget.upSwipeAllowed &&
+                        widget.superLikeTag != null &&
+                        ((upSwipePercentage > 0.0 && slideRegion == SlideRegion.inSuperLikeRegion) ||
+                            (slideOutDirection == SlideDirection.up &&
+                                widget.decision == Decision.superLike)))
+                      FilledAndOpacity(
+                          opacity: upSwipePercentage.abs(),
+                          child: widget.superLikeTag!)
+                  ],
+                )
+              : Container(),
         ),
       ),
     );
@@ -449,11 +442,9 @@ class FilledAndOpacity extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned.fill(
-        child: RepaintBoundary(
-      child: Opacity(
-        child: child,
-        opacity: opacity,
-      ),
+        child: Opacity(
+      child: child,
+      opacity: opacity,
     ));
   }
 }
