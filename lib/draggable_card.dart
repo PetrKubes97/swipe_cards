@@ -31,7 +31,8 @@ class DraggableCard extends StatefulWidget {
   final Function()? onUnsuccessfulSwipeAttempt;
 
   DraggableCard(
-      {this.card,
+      {super.key,
+      this.card,
       this.likeTag,
       this.nopeTag,
       this.superLikeTag,
@@ -236,6 +237,7 @@ class _DraggableCardState extends State<DraggableCard>
       }
 
       dragPosition = details.globalPosition;
+
       cardOffset = dragPosition! - dragStart!;
 
       if (null != widget.onSlideUpdate) {
@@ -399,7 +401,8 @@ class _DraggableCardState extends State<DraggableCard>
                           child: widget.nopeTag!),
                     if (widget.upSwipeAllowed &&
                         widget.superLikeTag != null &&
-                        ((upSwipePercentage > 0.0 && slideRegion == SlideRegion.inSuperLikeRegion) ||
+                        ((upSwipePercentage > 0.0 &&
+                                slideRegion == SlideRegion.inSuperLikeRegion) ||
                             (slideOutDirection == SlideDirection.up &&
                                 widget.decision == Decision.superLike)))
                       FilledAndOpacity(

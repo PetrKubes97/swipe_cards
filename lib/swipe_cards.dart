@@ -192,17 +192,10 @@ class _SwipeCardsState extends State<SwipeCards> {
       fit: widget.fillSpace == true ? StackFit.expand : StackFit.loose,
       children: <Widget>[
         if (widget.matchEngine.nextItem != null)
-          DraggableCard(
-            isDraggable: false,
-            card: _buildBackCard(),
-            upSwipeAllowed: widget.upSwipeAllowed,
-            leftSwipeAllowed: widget.leftSwipeAllowed,
-            rightSwipeAllowed: widget.rightSwipeAllowed,
-            isBackCard: true,
-            decision: Decision.undecided,
-          ),
+          _buildBackCard(),
         if (widget.matchEngine.currentItem != null)
           DraggableCard(
+            key: ValueKey(widget.matchEngine.currentItem!.content),
             card: _buildFrontCard(),
             likeTag: widget.likeTag,
             nopeTag: widget.nopeTag,
