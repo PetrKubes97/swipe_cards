@@ -62,8 +62,9 @@ class _SwipeCardsState extends State<SwipeCards> {
     }
     int? currentItemIndex = widget.matchEngine._currentItemIndex;
     if (currentItemIndex != null) {
-      _frontCard = Key(currentItemIndex.toString());
+      _frontCard = ValueKey(currentItemIndex.toString());
     }
+
     super.initState();
   }
 
@@ -101,7 +102,7 @@ class _SwipeCardsState extends State<SwipeCards> {
       if (_currentItem != null) {
         _currentItem!.addListener(_onMatchChange);
       }
-      _frontCard = Key(widget.matchEngine._currentItemIndex.toString());
+      _frontCard = ValueKey(widget.matchEngine._currentItemIndex.toString());
     });
   }
 
@@ -195,7 +196,6 @@ class _SwipeCardsState extends State<SwipeCards> {
           _buildBackCard(),
         if (widget.matchEngine.currentItem != null)
           DraggableCard(
-            key: ValueKey(widget.matchEngine.currentItem!.content),
             card: _buildFrontCard(),
             likeTag: widget.likeTag,
             nopeTag: widget.nopeTag,

@@ -9,7 +9,7 @@ enum SlideDirection { left, right, up }
 enum SlideRegion { inNopeRegion, inLikeRegion, inSuperLikeRegion }
 
 class DraggableCard extends StatefulWidget {
-  final Widget? card;
+  final Widget card;
   final Widget? likeTag;
   final Widget? nopeTag;
   final Widget? superLikeTag;
@@ -32,7 +32,7 @@ class DraggableCard extends StatefulWidget {
 
   DraggableCard(
       {super.key,
-      this.card,
+      required this.card,
       this.likeTag,
       this.nopeTag,
       this.superLikeTag,
@@ -365,6 +365,8 @@ class _DraggableCardState extends State<DraggableCard>
     final upSwipePercentage = getTagVisibility(
         max(min(yProgress, 0.0), -1.0).abs(), Decision.superLike);
 
+    if (anchorBounds == null) return SizedBox();
+
     // Shows tags on like/dislike/superlike click
     return Transform(
       transform: Matrix4.translationValues(cardOffset!.dx, cardOffset!.dy, 0.0)
@@ -379,38 +381,36 @@ class _DraggableCardState extends State<DraggableCard>
           onPanStart: _onPanStart,
           onPanUpdate: _onPanUpdate,
           onPanEnd: _onPanEnd,
-          child: widget.card != null
-              ? Stack(
-                  children: [
-                    widget.card!,
-                    if (widget.rightSwipeAllowed &&
-                        widget.likeTag != null &&
-                        (rightSideSwipePercentage > 0.0 ||
-                            (slideOutDirection == SlideDirection.right &&
-                                widget.decision != Decision.undecided)))
-                      FilledAndOpacity(
-                          opacity: rightSideSwipePercentage,
-                          child: widget.likeTag!),
-                    if (widget.leftSwipeAllowed &&
-                        widget.nopeTag != null &&
-                        (leftSideSwipePercentage > 0.0 ||
-                            (slideOutDirection == SlideDirection.left &&
-                                widget.decision != Decision.undecided)))
-                      FilledAndOpacity(
-                          opacity: leftSideSwipePercentage,
-                          child: widget.nopeTag!),
-                    if (widget.upSwipeAllowed &&
-                        widget.superLikeTag != null &&
-                        ((upSwipePercentage > 0.0 &&
-                                slideRegion == SlideRegion.inSuperLikeRegion) ||
-                            (slideOutDirection == SlideDirection.up &&
-                                widget.decision == Decision.superLike)))
-                      FilledAndOpacity(
-                          opacity: upSwipePercentage.abs(),
-                          child: widget.superLikeTag!)
-                  ],
-                )
-              : Container(),
+          child: Stack(
+            children: [
+              widget.card,
+              if (widget.rightSwipeAllowed &&
+                  widget.likeTag != null &&
+                  (rightSideSwipePercentage > 0.0 ||
+                      (slideOutDirection == SlideDirection.right &&
+                          widget.decision != Decision.undecided)))
+                FilledAndOpacity(
+                    opacity: rightSideSwipePercentage,
+                    child: widget.likeTag!),
+              if (widget.leftSwipeAllowed &&
+                  widget.nopeTag != null &&
+                  (leftSideSwipePercentage > 0.0 ||
+                      (slideOutDirection == SlideDirection.left &&
+                          widget.decision != Decision.undecided)))
+                FilledAndOpacity(
+                    opacity: leftSideSwipePercentage,
+                    child: widget.nopeTag!),
+              if (widget.upSwipeAllowed &&
+                  widget.superLikeTag != null &&
+                  ((upSwipePercentage > 0.0 &&
+                      slideRegion == SlideRegion.inSuperLikeRegion) ||
+                      (slideOutDirection == SlideDirection.up &&
+                          widget.decision == Decision.superLike)))
+                FilledAndOpacity(
+                    opacity: upSwipePercentage.abs(),
+                    child: widget.superLikeTag!)
+            ],
+          ),
         ),
       ),
     );

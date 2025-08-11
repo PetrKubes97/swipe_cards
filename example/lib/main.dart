@@ -102,13 +102,9 @@ class _MyHomePageState extends State<MyHomePage> {
             child: SwipeCards(
               matchEngine: _matchEngine!,
               itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  alignment: Alignment.center,
+                return Card(
                   color: _swipeItems[index].content.color,
-                  child: Text(
-                    _swipeItems[index].content.text,
-                    style: TextStyle(fontSize: 100),
-                  ),
+                  text: _swipeItems[index].content.text,
                 );
               },
               onStackFinished: () {
@@ -127,25 +123,22 @@ class _MyHomePageState extends State<MyHomePage> {
               likeTag: Container(
                 margin: const EdgeInsets.all(15.0),
                 padding: const EdgeInsets.all(3.0),
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green)
-                ),
+                decoration:
+                    BoxDecoration(border: Border.all(color: Colors.green)),
                 child: Text('Like'),
               ),
               nopeTag: Container(
                 margin: const EdgeInsets.all(15.0),
                 padding: const EdgeInsets.all(3.0),
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.red)
-                ),
+                decoration:
+                    BoxDecoration(border: Border.all(color: Colors.red)),
                 child: Text('Nope'),
               ),
               superLikeTag: Container(
                 margin: const EdgeInsets.all(15.0),
                 padding: const EdgeInsets.all(3.0),
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.orange)
-                ),
+                decoration:
+                    BoxDecoration(border: Border.all(color: Colors.orange)),
                 child: Text('Super Like'),
               ),
             ),
@@ -174,5 +167,35 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           )
         ])));
+  }
+}
+
+class Card extends StatefulWidget {
+  Card({Key? key, required this.color, required this.text}) : super(key: key);
+
+  final Color color;
+  final String text;
+
+  @override
+  State<Card> createState() => _CardState();
+}
+
+class _CardState extends State<Card> {
+  @override
+  void initState() {
+    super.initState();
+    print('recreating ${widget.text}');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      color: widget.color,
+      child: Text(
+        widget.text,
+        style: TextStyle(fontSize: 100),
+      ),
+    );
   }
 }
