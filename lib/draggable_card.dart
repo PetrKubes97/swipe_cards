@@ -237,6 +237,7 @@ class _DraggableCardState extends State<DraggableCard>
       }
 
       dragPosition = details.globalPosition;
+      if (dragPosition == null || dragStart == null) return;
 
       cardOffset = dragPosition! - dragStart!;
 
