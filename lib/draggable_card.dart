@@ -143,7 +143,7 @@ class _DraggableCardState extends State<DraggableCard>
   void didUpdateWidget(DraggableCard oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.card!.key != oldWidget.card!.key) {
+    if (widget.card.key != oldWidget.card.key) {
       cardOffset = const Offset(0.0, 0.0);
     }
 
@@ -366,8 +366,6 @@ class _DraggableCardState extends State<DraggableCard>
     final upSwipePercentage = getTagVisibility(
         max(min(yProgress, 0.0), -1.0).abs(), Decision.superLike);
 
-    if (anchorBounds == null) return SizedBox();
-
     // Shows tags on like/dislike/superlike click
     return Transform(
       transform: Matrix4.translationValues(cardOffset!.dx, cardOffset!.dy, 0.0)
@@ -375,8 +373,8 @@ class _DraggableCardState extends State<DraggableCard>
       origin: _rotationOrigin(anchorBounds),
       child: Container(
         key: profileCardKey,
-        width: anchorBounds?.width,
-        height: anchorBounds?.height,
+        width: anchorBounds?.width ?? double.infinity,
+        height: anchorBounds?.height ?? double.infinity,
         padding: widget.padding,
         child: GestureDetector(
           onPanStart: _onPanStart,
@@ -391,20 +389,18 @@ class _DraggableCardState extends State<DraggableCard>
                       (slideOutDirection == SlideDirection.right &&
                           widget.decision != Decision.undecided)))
                 FilledAndOpacity(
-                    opacity: rightSideSwipePercentage,
-                    child: widget.likeTag!),
+                    opacity: rightSideSwipePercentage, child: widget.likeTag!),
               if (widget.leftSwipeAllowed &&
                   widget.nopeTag != null &&
                   (leftSideSwipePercentage > 0.0 ||
                       (slideOutDirection == SlideDirection.left &&
                           widget.decision != Decision.undecided)))
                 FilledAndOpacity(
-                    opacity: leftSideSwipePercentage,
-                    child: widget.nopeTag!),
+                    opacity: leftSideSwipePercentage, child: widget.nopeTag!),
               if (widget.upSwipeAllowed &&
                   widget.superLikeTag != null &&
                   ((upSwipePercentage > 0.0 &&
-                      slideRegion == SlideRegion.inSuperLikeRegion) ||
+                          slideRegion == SlideRegion.inSuperLikeRegion) ||
                       (slideOutDirection == SlideDirection.up &&
                           widget.decision == Decision.superLike)))
                 FilledAndOpacity(

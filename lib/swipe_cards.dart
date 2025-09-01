@@ -196,6 +196,7 @@ class _SwipeCardsState extends State<SwipeCards> {
           _buildBackCard(),
         if (widget.matchEngine.currentItem != null)
           DraggableCard(
+            key: ValueKey(widget.matchEngine.currentItem!.content),
             card: _buildFrontCard(),
             likeTag: widget.likeTag,
             nopeTag: widget.nopeTag,
